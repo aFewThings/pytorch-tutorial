@@ -1,4 +1,4 @@
-import torch 
+import torch
 import torchvision
 import torch.nn as nn
 import numpy as np
@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 # 4. Input pipline                          (Line 104 to 129)
 # 5. Input pipline for custom dataset       (Line 136 to 156)
 # 6. Pretrained model                       (Line 163 to 176)
-# 7. Save and load model                    (Line 183 to 189) 
+# 7. Save and load model                    (Line 183 to 189)
 
 
 # ================================================================== #
@@ -34,9 +34,9 @@ y = w * x + b    # y = 2 * x + 3
 y.backward()
 
 # Print out the gradients.
-print(x.grad)    # x.grad = 2 
-print(w.grad)    # w.grad = 1 
-print(b.grad)    # b.grad = 1 
+print(x.grad)    # x.grad = 2
+print(w.grad)    # w.grad = 1
+print(b.grad)    # b.grad = 1
 
 
 # ================================================================== #
@@ -49,8 +49,8 @@ y = torch.randn(10, 2)
 
 # Build a fully connected layer.
 linear = nn.Linear(3, 2)
-print ('w: ', linear.weight)
-print ('b: ', linear.bias)
+print ('w: ', linear.weight.shape) # (2, 3) 왜 2x3인지는 모르겠음. 내부적으로 transpose 시키는 듯.
+print ('b: ', linear.bias.shape) # (2)
 
 # Build loss function and optimizer.
 criterion = nn.MSELoss()
@@ -67,7 +67,7 @@ print('loss: ', loss.item())
 loss.backward()
 
 # Print out the gradients.
-print ('dL/dw: ', linear.weight.grad) 
+print ('dL/dw: ', linear.weight.grad)
 print ('dL/db: ', linear.bias.grad)
 
 # 1-step gradient descent.
@@ -103,7 +103,7 @@ z = y.numpy()
 
 # Download and construct CIFAR-10 dataset.
 train_dataset = torchvision.datasets.CIFAR10(root='../../data/',
-                                             train=True, 
+                                             train=True,
                                              transform=transforms.ToTensor(),
                                              download=True)
 
@@ -114,7 +114,7 @@ print (label)
 
 # Data loader (this provides queues and threads in a very simple way).
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=64, 
+                                           batch_size=64,
                                            shuffle=True)
 
 # When iteration starts, queue and thread start to load data from files.
@@ -137,7 +137,7 @@ for images, labels in train_loader:
 class CustomDataset(torch.utils.data.Dataset):
     def __init__(self):
         # TODO
-        # 1. Initialize file paths or a list of file names. 
+        # 1. Initialize file paths or a list of file names.
         pass
     def __getitem__(self, index):
         # TODO
@@ -147,14 +147,15 @@ class CustomDataset(torch.utils.data.Dataset):
         pass
     def __len__(self):
         # You should change 0 to the total size of your dataset.
-        return 0 
+        return 0
 
-# You can then use the prebuilt data loader. 
+# You can then use the prebuilt data loader.
 custom_dataset = CustomDataset()
+"""
 train_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
-                                           batch_size=64, 
+                                           batch_size=64,
                                            shuffle=True)
-
+"""
 
 # ================================================================== #
 #                        6. Pretrained model                         #
@@ -165,10 +166,10 @@ resnet = torchvision.models.resnet18(pretrained=True)
 
 # If you want to finetune only the top layer of the model, set as below.
 for param in resnet.parameters():
-    param.requires_grad = False
+    param.requires_grad = False # freeze all layers
 
 # Replace the top layer for finetuning.
-resnet.fc = nn.Linear(resnet.fc.in_features, 100)  # 100 is an example.
+resnet.fc = nn.Linear(resnet.fc.in_features, 100)  # 100 is example classes.
 
 # Forward pass.
 images = torch.randn(64, 3, 224, 224)
